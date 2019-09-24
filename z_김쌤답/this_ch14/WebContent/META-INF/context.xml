@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- Default set of monitored resources. If one of these changes, the    -->
+    <!-- web application will be reloaded.                                   -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+    <!-- Uncomment this to disable session persistence across Tomcat restarts -->
+    <!--
+    <Manager pathname="" />
+    -->
+    <Resource removeAbandonedOnBorrow="true" removeAbandonedTimeout="10" logAbandoned="true" 
+          name="jdbc/orcl"
+         auth="Container"
+         type="javax.sql.DataSource"
+         username="system"
+         password="1111"
+         driverClassName="oracle.jdbc.driver.OracleDriver"
+         url="jdbc:oracle:thin:@localhost:1521:xe"
+         maxTotal="100" maxIdle="30" maxWaitMillis="10000"
+         />
+<!-- <ResourceLink global="jdbc/orcl" name="jdbc/orcl" type="javax.sql.DataSource"/> -->
+
+</Context>

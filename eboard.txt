@@ -1,0 +1,143 @@
+CREATE TABLE BOARD(
+NUM		NUMBER(8)		NOT NULL,	
+NAME		VARCHAR2(20)		NOT NULL,
+PASSWORD	VARCHAR2(20)		NOT NULL,
+SUBJECT	VARCHAR2(50)		NOT NULL,
+CONTENT	VARCHAR2(500)		NOT NULL,
+WRITE_DATE	DATE		NOT NULL,
+WRITE_TIME	TIMESTAMP	NOT NULL,
+REF		NUMBER(8)	NOT NULL,
+STEP		NUMBER(4)	NOT NULL,
+LEV		NUMBER(4)	NOT NULL,
+READ_CNT	NUMBER(8)	NOT NULL,
+CHILD_CNT	NUMBER(4)	NUOT NULL,
+PRIMARY KEY(NUM)
+);
+
+() 외우기(1) 
+()WebContent.META-INF.context.xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context>
+
+<WatchedResource>WEB-INF/web.xml</WatchedResource>
+<WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+ <Resource 
+    auth="Container" 
+    driverClassName="oracle.jdbc.driver.OracleDriver" 
+    name="jdbc/oracle" 
+    password="tiger" 
+    type="javax.sql.DataSource" 
+    url="jdbc:oracle:thin:@localhost:1521:xe" 
+    username="scott"/>  
+</Context>
+
+
+
+
+
+----
+()board.model.BoardDTO.java
+
+
+
+
+
+
+
+()board.command.BoardCmd.java
+
+execute(HttpServletRequest request, HttpServletResponse response);
+는 선언.
+
+<!--
+NoticeListCmd implements BoardCmd
+
+NewsListCmd implements BoardCmd
+
+FAQListCmd implements BoardCmd
+
+개발자는 NoticeListCmd, NewsListCmd, FAQListCmd 3개의 execute 메소드를 구현해야 하고
+사용자는 BoardCmd 의 execute 1개의 메소드만 호출하면 됩니다.
+-->
+
+BoardCmd.java 는 커맨드 패턴을 통해 BoardDAO 클래스를 이용하여 비지니스 로직 처리를 지시할 커맨드 클래스를
+구현해야하는 인터페이스, ...BoardFrontController 서브릿부터 전달 받아 필요한 기능 수행.
+이후 제작할 커맨드 클래스들은 
+
+
+
+
+
+
+
+()board.BoardFrontController.java (서블릿 파일였나봄.아니고 .bbs로 들어오게끔.)
+	import java.io.IOException;
+	import javax.servlet.ServletException;
+	import javax.servlet.annotation.WebServlet;
+	import javax.servlet.http.HttpServlet;
+	import javax.servlet.http.HttpServletRequest;
+	import javax.servlet.http.HttpServletResponse;
+
+	import javax.servlet.RequestDispatcher;
+	import board.command.*;
+앞 머리만 따면 안됨.. 전체로 외워야. 2번째 ,는 Exception2개, annotation.WebServlet; 새롭고,
+
+@WebServlet("*.bbs")
+//	import javax.servlet.annotation.WebServlet;
+	public class BoardFrontController extends HttpServlet {
+		private static final long serialVersionUID = 1L;
+		/**
+		 * @see HttpServlet#httpServlet()
+		 * 
+		 */
+		public BoardFrontController() {
+			super();
+
+//@see
+다른 클래스나 메소드를 참고할 경우 사용.
+
+//
+<%String pathWebcontent=request.getContextPath();%>
+<link rel="stylesheet" type="text/css" href="<%=pathWebcontent%>/css/bootstrap.css">
+//Here String pathWebcontent would give you
+
+
+
+
+
+
+
+
+()BoardDAO.java
+//게시판 목록을 가져오기 위한 BoardDAO 클래스의 boardList() boardPageCnt() 메서드를 구현
+
+
+	import java.sql.*;
+	import java.util.ArrayList;
+	import javax.naming.*;
+	import javax.sql.DataSource;
+
+//sql, ArrayList, naming, DataSource;
+//public ArrayList<BoardDTO> boardList(String curPage){
+
+	=> 넘어온 현재 페이지(curPage) 가 2라면 WRITING_PER_PAGE가 10이니까  db에서 11번째부터 20번째까지의 데이터를 조회해서 	BoardDTO 10개를 만들고 그걸 ArrayList 에 담아서 리턴합니다.
+
+ 
+	public BoardDTO boardRead(String inputNum){
+
+	=> inputNum이니까 글번호에 해당합니다. 따라서 글번호에 해당하는 1개 데이터를 db에서 조회해서 BoardDTO에 담고 리턴합니다.
+
+ 
+	public ArrayList<BoardDTO> boardSearch(String searchOption, String searchWord){
+	=> 검색키와 검색어를 받아서 db에서 검색어에 해당하는 글들을 조회합니다. 검색어에 일치하는 데이터가 여러개가 될 수 있으니까 	검색된 로우 수만큼 BoardDTO를 만들고 그걸 ArrayList에 담아서 리턴합니다.
+//외우기(1)
+String sql = "SELECT * FROM "
+					+ "(SELECT ROWNUM rnum, num, name, password, subject, "
+					+ "content, write_date, write_time, ref, step, lev, "
+					+ "read_cnt, child_cnt "
+					+ "FROM ( SELECT * FROM BOARD ORDER BY ref desc, step asc ) "
+					+ "BOARD )";
+			sql += " WHERE rnum >= ? and rnum <= ?";
+ㄴ
